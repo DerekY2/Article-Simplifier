@@ -1,4 +1,7 @@
-# Project Name
+# Article Simplifier
+
+## Demo URL
+https://article-simplifier--development.gadget.app/
 
 ## Overview
 
