@@ -48,7 +48,8 @@
     "tailwindcss-animate": "^1.0.7",
     "openai": "^5.0.0-beta.0",
     "pdf-parse": "^1.1.1",
-    "got": "^14.4.6"
+    "got": "^14.4.6",
+    "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {
     "@react-router/dev": "^7.0.2",

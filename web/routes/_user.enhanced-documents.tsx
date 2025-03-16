@@ -21,8 +21,7 @@ export default function EnhancedDocuments() {
       },
       notes: {
         markdown: true
-      },
-      highlights: true
+      }
     },
     sort: { createdAt: "Descending" }
   });
@@ -83,7 +82,7 @@ export default function EnhancedDocuments() {
                 {enhancedDocuments.map((doc) => (
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium">
-                      {doc.originalDocument.title}
+                      {doc.originalDocument?.title}
                     </TableCell>
                     <TableCell>{formatDate(doc.createdAt)}</TableCell>
                     <TableCell className="text-right">
@@ -91,7 +90,7 @@ export default function EnhancedDocuments() {
                         <Button
                           variant="outline"
                           size="icon"
-                          onClick={() => navigate(`/documents/${doc.originalDocument.id}`)}
+                          onClick={() => navigate(`/documents/${doc.originalDocument?.id}`)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { api } from "../api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,7 +24,6 @@ export default function CreateSimplification() {
   
   // Form state
   const [notes, setNotes] = useState("");
-  const [highlights, setHighlights] = useState<Record<string, any>>({});
   
   // Load the original document
   useEffect(() => {
@@ -67,7 +66,7 @@ export default function CreateSimplification() {
       // Simulate processing delay
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Simulate generating notes and highlights
+      // Simulate generating notes
       const generatedNotes = `# Key Points from ${document.title}
 
 * The document discusses important concepts related to the main topic
@@ -77,19 +76,7 @@ export default function CreateSimplification() {
 ## Summary
 This is an AI-generated summary of the document, highlighting the most important points and concepts discussed.`;
       
-      const generatedHighlights = {
-        section1: {
-          text: "This is an important section that discusses key concepts",
-          importance: "high"
-        },
-        section2: {
-          text: "Another important section with relevant information",
-          importance: "medium"
-        }
-      };
-      
       setNotes(generatedNotes);
-      setHighlights(generatedHighlights);
       setError(null);
     } catch (err: any) {
       console.error("Error processing document:", err);
@@ -111,7 +98,6 @@ This is an AI-generated summary of the document, highlighting the most important
         notes: {
           markdown: notes
         },
-        highlights: highlights,
         originalDocument: {
           _link: documentId
         },
@@ -184,7 +170,7 @@ This is an AI-generated summary of the document, highlighting the most important
     <div className="container max-w-4xl py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Extract Key Points</CardTitle>
+          <CardTitle>Generate Notes</CardTitle>
           <CardDescription>
             Analyzing document: {document?.title}
           </CardDescription>
@@ -218,47 +204,17 @@ This is an AI-generated summary of the document, highlighting the most important
                 </div>
               ) : (
                 <>
-                  <Tabs defaultValue="notes">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="notes">Notes</TabsTrigger>
-                      <TabsTrigger value="highlights">Highlights</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="notes" className="mt-4">
-                      <div className="space-y-4">
-                        <Label htmlFor="notes">Generated Notes</Label>
-                        <Textarea 
-                          id="notes"
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value)}
-                          className="min-h-[300px] font-mono"
-                        />
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="highlights" className="mt-4">
-                      <div className="space-y-4">
-                        <Label>Extracted Highlights</Label>
-                        <div className="border rounded-md p-4 space-y-4">
-                          {Object.entries(highlights).map(([key, value]: [string, any]) => (
-                            <div key={key} className="pb-4 border-b last:border-0 last:pb-0">
-                              <div className="flex justify-between items-start">
-                                <p className="font-medium">{key}</p>
-                                <span className={`text-xs px-2 py-1 rounded-full ${
-                                  value.importance === 'high' ? 'bg-red-100 text-red-800' : 
-                                  value.importance === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
-                                  'bg-blue-100 text-blue-800'
-                                }`}>
-                                  {value.importance}
-                                </span>
-                              </div>
-                              <p className="text-sm text-gray-600 mt-1">{value.text}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
+                  <div className="mt-4">
+                    <div className="space-y-4">
+                      <Label htmlFor="notes">Generated Notes</Label>
+                      <Textarea 
+                        id="notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="min-h-[300px] font-mono"
+                      />
+                    </div>
+                  </div>
                   
                   <div className="flex justify-end space-x-3 mt-6">
                     <Button
