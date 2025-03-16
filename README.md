@@ -1,11 +1,13 @@
 # Article Simplifier
 
 ## Demo URL
-https://article-simplifier--development.gadget.app/
+https://article-simplifier.gadget.app/
 
 ## Overview
 
-This is a Gadget web application built with React, TypeScript, and Vite. It includes a server-side component and a client-side component, with configurations for Tailwind CSS and PostCSS.
+Article Simplifier is a powerful web application that transforms complex articles and text content into easier-to-understand versions. Built on the Gadget platform using React, TypeScript, and Vite, it helps users quickly comprehend difficult content by simplifying language, reducing complexity, and highlighting key information.
+
+The application uses advanced natural language processing techniques to maintain the core meaning of content while making it more accessible to a wider audience. Whether you're a student trying to understand academic papers, a professional dealing with technical documents, or anyone who encounters complex written content, Article Simplifier streamlines your reading experience.
 
 ## Project Structure
 
@@ -106,7 +108,52 @@ yarn build
 - **PostCSS**: Configured in `postcss.config.js`
 - **TypeScript**: Configured in `tsconfig.json`, `tsconfig.api.json`, and `tsconfig.web.json`
 - **Vite**: Configured in `vite.config.mts`
+- **Gadget**: Backend functionality configured in `.gadget/` directory
 
-## License
+## Development Guidelines
 
-This project is licensed under the MIT License.
+### Code Style
+
+This project follows standard TypeScript and React best practices:
+- Use functional components with hooks
+- Follow the ESLint configuration for code style
+- Write tests for new features
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Backend Development
+
+- API routes are defined in `api/routes/`
+- Models are defined in `api/models/`
+- Custom actions are defined in `api/actions/`
+
+### Frontend Development
+
+- React components are located in `web/components/`
+- Page routes are defined in `web/routes/`
+- Utility functions are in `web/lib/`
+
+## Troubleshooting
+
+### Common Issues
+
+- **API Key Problems**: Ensure all required API keys are properly set in your `.env` file
+- **CORS Issues**: When testing locally, you may need to enable CORS in your browser or use a CORS proxy
+- **Simplification Quality**: Adjust the simplification level in settings for better results
+- **Major Failure Points**: This app is experimental, and incomplete. Major functionalities such as text-extraction, NLP & Interpretation do not work.
+
+### Getting Help
+
+If you encounter issues not covered in this documentation, please:
+1. Check existing GitHub issues
+3. Open a new issue with detailed reproduction steps
+
+## Contact
+
+GitHub Repository: [article-simplifier](https://github.com/DerekY2/Article-Simplifier)
