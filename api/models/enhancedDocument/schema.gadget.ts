@@ -9,7 +9,6 @@ export const schema: GadgetModel = {
   comment:
     "The enhancedDocument model stores AI-processed versions of documents, including extracted key points, highlights, and notes, and is used to provide users with enhanced document viewing capabilities.",
   fields: {
-    highlights: { type: "json", storageKey: "fMybY2OJaJE_" },
     notes: {
       type: "richText",
       validations: { required: true },

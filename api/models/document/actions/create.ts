@@ -14,7 +14,7 @@ export const run: ActionRun = async ({ params, record, logger, api, connections 
       // Extract text from the PDF using pdf-parse
       const pdfData = await pdfParse(pdfBuffer);
 
-      logger.info("pdfData:",pdfData)
+      logger.info(`pdfData: ${pdfData}`)
       
           // Set the extracted text to params so applyParams can properly handle the RichText field
       params.document = params.document || {};
@@ -22,7 +22,7 @@ export const run: ActionRun = async ({ params, record, logger, api, connections 
         markdown: pdfData.text || "No text extracted from PDF"
       };
       
-      logger.info(`Extracted ${pdfData.text.length} characters from PDF: ${record.pdfFile.fileName}`);
+      logger.info(`Extracted ${pdfData.text.length} characters from PDF: ${record.pdfFile.fileName}; full text: ${pdfData.text}`);
     } catch (error) {
       logger.error("Error extracting text from PDF", { error });
       // Still continue with the upload even if text extraction fails
