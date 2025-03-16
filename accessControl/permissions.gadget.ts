@@ -27,6 +27,17 @@ export const permissions: GadgetPermissions = {
             update: true,
           },
         },
+        enhancedDocument: {
+          read: {
+            filter:
+              "accessControl/filters/enhancedDocument/signed-in-read.gelly",
+          },
+          actions: {
+            create: true,
+            delete: true,
+            update: true,
+          },
+        },
         simplifiedDocument: {
           read: {
             filter:
@@ -62,6 +73,9 @@ export const permissions: GadgetPermissions = {
             },
           },
         },
+      },
+      actions: {
+        generatePdfUploadToken: true,
       },
     },
     unauthenticated: {

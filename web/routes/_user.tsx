@@ -6,8 +6,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useSignOut } from "@gadgetinc/react";
-import { FileText, Home, LogOut, Menu, User } from "lucide-react";
+import { FileEdit, FileText, Home, LogOut, Menu, User } from "lucide-react";
 import { useState } from "react";
 import {
   Link,
@@ -124,6 +125,18 @@ const SideBar = () => {
           <FileText className="mr-3 h-4 w-4" />
           Documents
         </Link>
+        <Link
+          to="/enhanced-documents"
+          className={`flex items-center px-4 py-2 text-sm rounded-md transition-colors
+      ${
+        location.pathname === "/enhanced-documents"
+          ? "bg-accent text-accent-foreground"
+          : "hover:bg-accent hover:text-accent-foreground"
+      }`}
+        >
+          <FileEdit className="mr-3 h-4 w-4" />
+          Enhanced Documents
+        </Link>
       </nav>
     </div>
   );
@@ -173,7 +186,8 @@ export default function ({ loaderData }: Route.ComponentProps) {
       <div className="flex-1 flex flex-col md:pl-64">
         <header className="h-16 flex items-center justify-between px-6 border-b bg-background">
           <SideBarMenuButtonDrawer />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-4">
+            <ThemeToggle />
             <UserMenu user={user} />
           </div>
         </header>

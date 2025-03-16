@@ -8,6 +8,8 @@ import {
 } from "react-router";
 import { Suspense } from "react";
 import { api } from "./api";
+import { ThemeProvider } from "./components/theme-provider";
+
 import "./app.css";
 import type { GadgetConfig } from "gadget-server";
 import type { Route } from "./+types/root";
@@ -20,7 +22,7 @@ export const links = () => [
 export const meta = () => [
   { charset: "utf-8" },
   { name: "viewport", content: "width=device-width, initial-scale=1" },
-  { title: "Gadget React Router app" },
+  { title: "Article Simplifier" },
 ];
 
 export type RootOutletContext = {
@@ -41,16 +43,18 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const { gadgetConfig, csrfToken } = loaderData;
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <Meta />
         <Links />
       </head>
       <body>
         <Suspense>
-          <GadgetProvider api={api}>
-            <Outlet context={{ gadgetConfig, csrfToken }} />
-          </GadgetProvider>
+          <ThemeProvider defaultTheme="light">
+            <GadgetProvider api={api}>
+              <Outlet context={{ gadgetConfig, csrfToken }} />
+            </GadgetProvider>
+          </ThemeProvider>
         </Suspense>
         <ScrollRestoration />
         <Scripts />

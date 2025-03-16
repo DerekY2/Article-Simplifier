@@ -13,6 +13,10 @@ type Params = {
   "/verify-email": {};
   "/sign-in": {};
   "/sign-up": {};
+  "/create-simplification/:documentId": {
+    "documentId": string;
+  };
+  "/enhanced-documents": {};
   "/documents": {};
   "/signed-in": {};
   "/profile": {};

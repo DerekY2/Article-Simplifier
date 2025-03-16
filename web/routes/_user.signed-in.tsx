@@ -63,7 +63,6 @@ export default function () {
 
   const openDialog = () => {
     if (!selectedFile) {
-      toast.error("No file selected. Please select a PDF document to upload");
       return;
     }
     
@@ -81,10 +80,11 @@ export default function () {
 
     try {
       setIsUploading(true);
+      setDialogOpen(false);
       setUploadProgress(10);
 
       // Get a direct upload token
-      const { url, token } = await api.getDirectUploadToken();
+      const { uploadUrl, token } = await api.generatePdfUploadToken();
       
       // Create a progress interval
       const progressInterval = setInterval(() => {
@@ -92,7 +92,7 @@ export default function () {
       }, 200);
       
       // Upload the file directly to the URL
-      await fetch(url, {
+      await fetch(uploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": selectedFile.type,
@@ -118,16 +118,13 @@ export default function () {
       toast.success("Upload successful. Your document has been uploaded and is being processed");
 
       // Navigate to documents page
-      setTimeout(() => {
-        navigate("/documents");
-      }, 1000);
+      navigate("/documents");
+      // setIsUploading(false);
 
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Upload failed. There was an error uploading your document. Please try again.");
-    } finally {
       setIsUploading(false);
-      setDialogOpen(false);
     }
   };
 
@@ -136,8 +133,8 @@ export default function () {
       <div className="grid gap-6">
         <div>
           <Card className="overflow-hidden">
-            <div className="flex items-start justify-between p-6">
-              <div className="space-y-4">
+            <div className="p-6">
+              <div className="space-y-4 w-full text-center">
                 <h2 className="text-2xl font-bold">Welcome to Article Simplifier</h2>
                 <div className="space-y-2">
                   <p className="text-base">
@@ -149,10 +146,11 @@ export default function () {
                 </div>
                 
                 <div 
-                  className={`mt-4 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
+                  className={`mt-4 border-2 border-dashed rounded-lg p-6 text-center border-opacity-40 transition-colors ${!isUploading ? 'hover:border-opacity-100 cursor-pointer' : 'opacity-60 cursor-not-allowed'} ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'}`} 
+                  onDragOver={!isUploading ? handleDragOver : (e) => e.preventDefault()}
+                  onDragLeave={!isUploading ? handleDragLeave : (e) => e.preventDefault()}
+                  onDrop={!isUploading ? handleDrop : (e) => e.preventDefault()}
+                  onClick={!isUploading ? () => fileInputRef.current?.click() : undefined}
                 >
                   <input
                     ref={fileInputRef}
@@ -173,7 +171,10 @@ export default function () {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
                       disabled={isUploading}
                     >
                       Choose file
@@ -182,21 +183,19 @@ export default function () {
                 </div>
 
                 {selectedFile && !isUploading && (
-                  <div className="flex justify-center mt-4">
-                    <Button
-                      onClick={openDialog}
-                      className="w-full sm:w-auto"
-                      size="lg"
-                    >
-                      <Upload className="mr-2 h-4 w-4" /> Upload Document
-                    </Button>
-                  </div>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={openDialog}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Document
+                  </Button>
                 )}
-
+                
                 {isUploading && (
-                  <div className="space-y-2 mt-4">
+                  <div className="mt-6 space-y-4">
                     <Progress value={uploadProgress} />
-                    <p className="text-xs text-center text-gray-500">
+                    <p className="text-sm text-center text-gray-500">
                       Uploading... {uploadProgress}%
                     </p>
                   </div>
@@ -212,19 +211,15 @@ export default function () {
                     navigate("/documents");
                   }}
                   className="w-full"
+                  disabled={isUploading}
                 >
                   View My Documents
                 </Button>
               </div>
-              <img
-                src="https://assets.gadget.dev/assets/default-app-assets/react-logo.svg"
-                className="app-logo h-24 w-24"
-                alt="logo"
-              />
             </div>
           </Card>
         </div>
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <div className="space-y-6">
             <h2 className="text-xl font-semibold">Current user</h2>
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -271,82 +266,57 @@ export default function () {
                 >
                   user
                 </a>{" "}
-                via your autogenerated API.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Use the upload area above to start processing your documents.
+                model. Try adding more properties to it!
               </p>
             </div>
           </div>
-        </Card>
+        </Card> */}
       </div>
       
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Upload Document</DialogTitle>
+            <DialogTitle>Document Details</DialogTitle>
             <DialogDescription>
-              Add title and description for your document.
+              Provide details for your document. This information will help you identify and organize your documents.
             </DialogDescription>
           </DialogHeader>
-          
           <div className="grid gap-4 py-4">
-            <div className="flex items-center gap-4">
-              <Label htmlFor="document-title" className="w-20">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">
                 Title
               </Label>
-              <Input 
-                id="document-title" 
-                value={documentTitle}
+              <Input
+                id="title"
+                value={documentTitle} 
                 onChange={(e) => setDocumentTitle(e.target.value)}
-                className="flex-1"
-                required
+                className="col-span-3"
               />
             </div>
-            
-            <div className="flex items-center gap-4">
-              <Label htmlFor="document-description" className="w-20">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
                 Description
               </Label>
-              <Input 
-                id="document-description" 
+              <Input
+                id="description"
                 value={documentDescription}
                 onChange={(e) => setDocumentDescription(e.target.value)}
-                className="flex-1"
+                className="col-span-3"
               />
             </div>
-            
-            <div className="text-sm text-muted-foreground">
-              Selected file: {selectedFile?.name}
-            </div>
           </div>
-          
-          {isUploading && (
-            <div className="space-y-2">
-              <Progress value={uploadProgress} />
-              <p className="text-xs text-center text-gray-500">
-                Uploading... {uploadProgress}%
-              </p>
-            </div>
-          )}
-          
           <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setDialogOpen(false)}
-              disabled={isUploading}
-            >
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleUpload}
-              disabled={!documentTitle || isUploading}
-            >
+            <Button onClick={handleUpload} disabled={isUploading}>
               Upload
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+
     </div>
   );
 }

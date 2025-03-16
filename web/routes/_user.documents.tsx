@@ -4,10 +4,9 @@ import { api } from "../api";
 import { AutoForm } from "../components/auto";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Separator } from "../components/ui/separator";
 import { useFindMany, useActionForm } from "@gadgetinc/react";
-import { Plus, FileText, Trash2, RefreshCw, Upload, ArrowLeft } from "lucide-react";
+import { Plus, FileText, Trash2, RefreshCw, Upload, ArrowLeft, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -15,9 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function DocumentsPage() {
-  const [activeTab, setActiveTab] = useState("upload");
   const navigate = useNavigate();
   const [{ data, error, fetching }, refresh] = useFindMany(api.document, {
     sort: { createdAt: "Descending" },
@@ -60,7 +59,6 @@ export default function DocumentsPage() {
   const handleCreateSuccess = () => {
     setDialogOpen(false);
     resetUploadState();
-    setActiveTab("list");
     refresh();
     toast.success("Document uploaded successfully!");
   };
@@ -149,23 +147,7 @@ export default function DocumentsPage() {
     }
   };
   
-  // Function to handle viewing a simplified document
-  const viewSimplified = async (documentId: string) => {
-    // First check if a simplified document exists
-    const simplifiedDocs = await api.simplifiedDocument.findMany({
-      filter: { originalDocumentId: { equals: documentId } },
-      first: 1,
-    });
 
-    if (simplifiedDocs.length > 0) {
-      // Navigate to a view page for the simplified document
-      // This is just a placeholder - you would implement the actual view page separately
-      window.open(`/simplified/${simplifiedDocs[0].id}`, "_blank");
-    } else {
-      // Show some notification that no simplified version exists yet
-      toast.error("No simplified version exists for this document yet.");
-    }
-  };
 
   // Function to generate a new simplification
   const generateSimplification = async (documentId: string) => {
@@ -346,144 +328,126 @@ export default function DocumentsPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Document Management</h1>
         <p className="text-muted-foreground">
-          Upload, manage, and simplify your documents
+          Upload, manage, and summarize your documents
         </p>
       </div>
 
       <Separator />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full md:w-[400px] grid-cols-2">
-          <TabsTrigger value="upload">
-            <Plus className="mr-2 h-4 w-4" />
-            Upload New
-          </TabsTrigger>
-          <TabsTrigger value="list">
-            <FileText className="mr-2 h-4 w-4" />
-            Your Documents
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="upload" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload New Document</CardTitle>
-              <CardDescription>
-                Upload a PDF file with a title and description.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => {
+      <Card className="mb-6">
+        <CardHeader className="pb-2">
+          <div>
+            <CardTitle className="text-xl">Your Documents</CardTitle>
+            <CardDescription className="mt-1">
+              Manage your uploaded documents and create simplifications.
+            </CardDescription>
+          </div>
+        </CardHeader>
+        
+        <Separator className="mb-4" />
+        <CardContent>
+          <div className="mb-4">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  onClick={() => {
                     resetUploadState();
                     setDialogOpen(true);
-                  }} className="w-full md:w-auto">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload PDF
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  {renderUploadDialogContent()}
-                </DialogContent>
-              </Dialog>
-              
-              <p className="text-sm text-muted-foreground mt-4">
-                Click the button above to upload a PDF document. You'll be able to add details after selecting the file.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="list" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Documents</CardTitle>
-              <CardDescription>
-                Manage your uploaded documents and create simplifications.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {fetching ? (
-                <div className="text-center py-8">Loading documents...</div>
-              ) : error ? (
-                <div className="text-center text-red-500 py-8">
-                  Error loading documents: {error.message}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-3 px-4">Title</th>
-                        <th className="text-left py-3 px-4">Description</th>
-                        <th className="text-left py-3 px-4">Date Uploaded</th>
-                        <th className="text-center py-3 px-4">Actions</th>
+                  }}
+                  className="shadow-sm hover:shadow transition-all duration-200"
+                  size="default"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload PDF
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                {renderUploadDialogContent()}
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {fetching ? (
+            <div className="text-center py-8">Loading documents...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-8">
+              Error loading documents: {error.message}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Title</th>
+                    <th className="text-left py-3 px-4">Description</th>
+                    <th className="text-left py-3 px-4">Date Uploaded</th>
+                    <th className="text-center py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!data || data.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="text-center py-8">
+                        No documents found. Upload a document to get started.
+                      </td>
+                    </tr>
+                  ) : (
+                    data.map((document) => (
+                      <tr key={document.id} className="border-b hover:bg-accent hover:bg-opacity-50">
+                        <td className="py-4 px-4">
+                          <a 
+                            href={document.pdfFile.url} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="font-medium text-blue-600 hover:underline"
+                          >
+                            {document.title}
+                          </a>
+                        </td>
+                        <td className="py-4 px-4">
+                          {document.description || "No description"}
+                        </td>
+                        <td className="py-4 px-4">
+                          {format(new Date(document.createdAt), "PPP")}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex justify-center gap-2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-gradient-to-r from-amber-200 to-amber-400 hover:from-amber-300 hover:to-amber-500 text-slate-800 hover:scale-105 transition-all duration-200"
+                                    onClick={() => generateSimplification(document.id)}
+                                  >
+                                    <Sparkles className="h-4 w-4 mr-1 text-amber-700"/>
+                                    Interpret
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>AI-powered analysis to extract and highlight important information</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => deleteDocument(document.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {!data || data.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="text-center py-8">
-                            No documents found. Upload a document to get started.
-                          </td>
-                        </tr>
-                      ) : (
-                        data.map((document) => (
-                          <tr key={document.id} className="border-b bg-white bg-opacity-0 hover:bg-opacity-10">
-                            <td className="py-4 px-4">
-                              <a 
-                                href={document.pdfFile.url} 
-                                target="_blank" 
-                                rel="noreferrer"
-                                className="font-medium text-blue-600 hover:underline"
-                              >
-                                {document.title}
-                              </a>
-                            </td>
-                            <td className="py-4 px-4">
-                              {document.description || "No description"}
-                            </td>
-                            <td className="py-4 px-4">
-                              {format(new Date(document.createdAt), "PPP")}
-                            </td>
-                            <td className="py-4 px-4">
-                              <div className="flex justify-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => viewSimplified(document.id)}
-                                >
-                                  View Simplified
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => generateSimplification(document.id)}
-                                >
-                                  <RefreshCw className="h-4 w-4 mr-2" />
-                                  Simplify
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => deleteDocument(document.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

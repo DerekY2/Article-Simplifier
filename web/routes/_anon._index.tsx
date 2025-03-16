@@ -6,18 +6,11 @@ export default function () {
   return (
     <Card className="p-8">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">👋 Hey, Developer!</CardTitle>
+        <CardTitle className="text-xl font-semibold">Article Simplifier</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-base">
-          Start building your app&apos;s signed out area in <a
-            href="/edit/files/web/routes/_anon._index.jsx"
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium hover:underline"
-          >
-            web/routes/_anon._index.jsx
-          </a>
+          Get started:
         </p>
         
         <Button
